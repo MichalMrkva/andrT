@@ -48,7 +48,6 @@ fun MvvmScreen(
 	val textFieldState by vm.textFieldState.collectAsStateWithLifecycle()
 	val itemsState by vm.items.collectAsStateWithLifecycle()
 
-	//Pass všech states/callbacks do contentu
 	MvvmContent(
 		snack = snackBarHostState,
 		inputField = textFieldState,
