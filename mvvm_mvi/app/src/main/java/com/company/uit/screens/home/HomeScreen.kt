@@ -26,6 +26,11 @@ fun HomeScreen(navController: NavController) {
 			) {
 				Text("Mvi screen")
 			}
+			Button(
+				onClick = { navController.navigate(Screens.Mvvm) }
+			) {
+				Text("Mvvm screen")
+			}
 		}
 	}
 }

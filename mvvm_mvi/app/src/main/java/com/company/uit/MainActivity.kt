@@ -5,16 +5,13 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import com.company.uit.screens.AppNavigation
-import com.company.uit.ui.theme.MvvmMviTheme
 
 class MainActivity : ComponentActivity() {
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
 		enableEdgeToEdge()
 		setContent {
-			MvvmMviTheme {
-				AppNavigation()
-			}
+			AppNavigation()
 		}
 	}
 }

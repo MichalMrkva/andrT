@@ -6,6 +6,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.company.uit.screens.home.HomeScreen
 import com.company.uit.screens.mvi.MviScreen
+import com.company.uit.screens.mvvm.MvvmScreen
 
 @Composable
 fun AppNavigation() {
@@ -21,7 +22,7 @@ fun AppNavigation() {
 			HomeScreen(navController)
 		}
 		composable<Screens.Mvvm> {
-			MviScreen(navController)
+			MvvmScreen(navController)
 		}
 	}
 }

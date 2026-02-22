@@ -1,4 +1,4 @@
-package com.company.uit.screens.mvi
+package com.company.uit.screens.mvvm
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -21,19 +21,19 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-
+import com.company.uit.screens.mvi.MviUiSideEffect
 
 @Composable
-fun MviScreen(
+fun MvvmScreen(
 	navController: NavController,
-	vm: MviViewModel = viewModel()
+	vm: MvvmViewModel = viewModel()
 ) {
 	val snackBarHostState = remember { SnackbarHostState() }
 
 	LaunchedEffect(vm) {
 		vm.uiSideEffect.collect { effect ->
 			when (effect) {
-				is MviUiSideEffect.NavigateBack -> navController.popBackStack()
+				is com.company.uit.screens.mvi.MviUiSideEffect.NavigateBack -> navController.popBackStack()
 
 				is MviUiSideEffect.ShowSnackBar -> {
 					snackBarHostState.showSnackbar(
@@ -45,20 +45,28 @@ fun MviScreen(
 		}
 	}
 
-	val state by vm.uiState.collectAsStateWithLifecycle()
+	val textFieldState by vm.textFieldState.collectAsStateWithLifecycle()
+	val itemsState by vm.items.collectAsStateWithLifecycle()
 
-	MviContent(
+	//Pass všech states/callbacks do contentu
+	MvvmContent(
 		snack = snackBarHostState,
-		state = state,
-		action = vm::onAction
+		inputField = textFieldState,
+		items = itemsState,
+		onAddItem = vm::addItem,
+		onNavBack = vm::navigateBack,
+		onInputChange = vm::textFieldChange
 	)
 }
 
 @Composable
-fun MviContent(
+fun MvvmContent(
 	snack: SnackbarHostState,
-	state: MviUIState,
-	action: (HomeUIAction) -> Unit
+	inputField: String,
+	items: List<String>,
+	onAddItem: () -> Unit,
+	onNavBack: () -> Unit,
+	onInputChange: (String) -> Unit,
 ) {
 	Scaffold(
 		snackbarHost = { SnackbarHost(snack) }
@@ -67,22 +75,22 @@ fun MviContent(
 			modifier = Modifier.padding(paddingValues)
 		) {
 			Button(
-				onClick = { action(HomeUIAction.NavigateBack) },
+				onClick = { onNavBack() },
 				modifier = Modifier.fillMaxWidth()
 			) {
 				Text("GO BACK")
 			}
 			Row {
 				TextField(
-					value = state.inputField,
-					onValueChange = { action(HomeUIAction.TextFieldChanged(it)) }
+					value = inputField,
+					onValueChange = { onInputChange(it) }
 				)
-				Button(onClick = { action(HomeUIAction.AddItem) }) {
+				Button(onClick = { onAddItem() }) {
 					Text("add")
 				}
 			}
 			LazyColumn {
-				items(state.items) {
+				items(items) {
 					Text(it)
 				}
 			}

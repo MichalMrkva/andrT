@@ -1,7 +1,8 @@
-package com.company.uit.screens.mvi
+package com.company.uit.screens.mvvm
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.company.uit.screens.mvi.MviUiSideEffect
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -9,38 +10,36 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class MviViewModel : ViewModel() {
-	private val _uiState = MutableStateFlow(MviUIState())
-	val uiState = _uiState.asStateFlow()
-
+class MvvmViewModel : ViewModel() {
 	private val _uiSideEffect = MutableSharedFlow<MviUiSideEffect>()
 	val uiSideEffect = _uiSideEffect.asSharedFlow()
 
-	fun onAction(action: HomeUIAction) = when (action) {
-		is HomeUIAction.TextFieldChanged -> _uiState.update { it.copy(inputField = action.s) }
-		is HomeUIAction.AddItem -> addItem()
-		is HomeUIAction.NavigateBack -> navigateBack()
-	}
+	private val _textFieldState = MutableStateFlow("")
+	val textFieldState = _textFieldState.asStateFlow()
 
-	private fun navigateBack() {
+	private val _items = MutableStateFlow(emptyList<String>())
+	val items = _items.asStateFlow()
+
+	fun textFieldChange(value: String) = _textFieldState.update { value }
+
+	fun navigateBack() {
 		viewModelScope.launch {
 			_uiSideEffect.emit(MviUiSideEffect.NavigateBack)
 		}
 	}
 
-	private fun addItem() {
+	fun addItem() {
 		var snackMsg: String? = null
 
-		_uiState.update { state ->
-			if (state.inputField.isNotBlank()) {
-				snackMsg = "Adding item: ${state.inputField}"
-				state.copy(
-					inputField = "",
-					items = state.items + state.inputField
-				)
+		_items.update {
+			val textFiledValue = _textFieldState.value
+			if (textFiledValue.isNotBlank()) {
+				_textFieldState.update { "" }
+				snackMsg = "Adding item: $textFiledValue"
+				it + textFiledValue
 			} else {
 				snackMsg = "You can't add empty item"
-				state
+				it
 			}
 		}
 
